@@ -142,7 +142,23 @@ WHERE claim_date >= DATE '2024-01-01'
 **Objective:** Identify peak sales days for each store to optimize staffing, inventory availability, promotional campaigns, and operational planning during high-demand periods.
 
 ```sql
-
+WITH day_orders
+AS(
+	SELECT
+		st.store_id, st.store_name,
+		EXTRACT(ISODOW FROM sl.sale_date) AS day_of_week,
+		TO_CHAR(sale_date, 'DAY') AS day_name,
+		SUM(sl.quantity) AS total_quantity_sold,
+		RANK() OVER (PARTITION BY st.store_id, st.store_name ORDER BY SUM(sl.quantity) DESC) AS rank_lvl
+	FROM sales sl
+		JOIN stores st
+			ON sl.store_id = st.store_id
+	GROUP BY st.store_id, st.store_name, day_of_week, day_name
+)
+SELECT
+	store_id, store_name, day_of_week, day_name, total_quantity_sold
+FROM day_orders
+WHERE rank_lvl = 1;
 ```
 
 ### 11. Identify the lowest-selling product in each country for every year to uncover underperforming products and support inventory optimization decisions.
@@ -297,7 +313,7 @@ AS(
 )
 SELECT
 	store_id, store_name, sales_year, current_year_sales, previous_year_sales,
-	CONCAT(ROUND((current_year_sales - previous_year_sales) * 100.0 / NULLIF(previous_year_sales, 0), 2), '%') AS growth_rate_percentage
+	ROUND((current_year_sales - previous_year_sales) * 100.0 / NULLIF(previous_year_sales, 0), 2) AS growth_rate_percentage
 FROM growth_rate;
 ```
 
