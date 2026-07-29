@@ -1,7 +1,7 @@
 # Apple Retail Sales & Warranty Analysis using PostgreSQL
 
 <p align="center">
-  <img src="images/apple_project_banner.png" alt="Before store_id INDEX image" width="900">
+  <img src="images/apple_project_banner.png" alt="Apple Store Banner" width="900">
 </p>
 
 ## Overview
